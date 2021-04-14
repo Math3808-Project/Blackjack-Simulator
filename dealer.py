@@ -8,9 +8,17 @@
 import definitions
 
 class Dealer:
-    def __init__():
-        # don't know what to put here...
-        return
+    """Class that represents the Dealer of a BlackJack game
+    Dealer will make a decision on their Blackjack hand according to the Dealer's default strategy (stand on 17 above; hit on 16 below)
+    
+    Parameters:
+
+    dev_mode (bool): Flag that indicates developer mode. In developer mode all debug and print statements will display.
+
+    """
+
+    def __init__(dev_mode=False):
+        Dealer.dev_mode = dev_mode
     
     def is_soft(hand):
         """Checks whether an Ace is contained within the given hand, meaning the current hand is a soft hand
@@ -111,6 +119,31 @@ class Dealer:
             else:
                 return curr_max
             
+    def print_decision(hand, decision):
+        """Print out current hand and decision that is given
+
+        Parameters:
+
+        hand (list of ints): The hand that the player was given, represented as a list of integers
+
+        decision (Actions enum): Decision that was made by the player
+
+        Returns:
+
+        void
+        """
+
+        # Reformatting hand structure such that Aces show up as A and not 1
+        formatted_hand = []
+        for val in hand:
+            if val == 1:
+                formatted_hand.append("A")
+            else:
+                formatted_hand.append(str(val))
+        
+        hand_str = "|".join(formatted_hand)
+
+        print("Dealer's Cards: {}\nDealer's Decision: {}".format(hand_str, decision))
     
     def compute_play(hand):
         """Computes the dealer's decision based on their given BlackJack hand
@@ -135,5 +168,10 @@ class Dealer:
         if total < 17:
             decision = definitions.Actions.HIT
         
+
+        # If dev mode set, print out dealer's hand and resultant decision
+        if Dealer.dev_mode:
+            Dealer.print_decision(hand, decision)
+
         return decision
         

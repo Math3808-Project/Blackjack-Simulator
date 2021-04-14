@@ -5,7 +5,7 @@ Final Project - MATH 3808 W21
 ## Project Info
 
 ### Members
-- Eren Sulutas
+- Eren Sulutas - 101101873
 - Nabeel Warsalee - 101103167
 - Cailyn Edwards
 - Henry Wang

@@ -81,7 +81,7 @@ class Player:
             for val in hand:
                 # Case where we encountered an Ace
                 if (val == 1):
-                    total[0] += 10
+                    total[0] += 11
                     total[1] += 1
                 else:
                     total[0] += val

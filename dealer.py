@@ -25,32 +25,63 @@ class Dealer:
 
         Parameters:
 
-        hand (list of ints): The hand that the player was given, represented as a list of integers
+        hand (list of Card objects): The hand that the dealer was given, represented as a list of Card objects
 
         Returns:
 
         bool:Whether given hand is soft or not
         """
 
-        return 1 in hand
+        for card in hand:
+            if card.value == "Ace":
+                return True
+
+        return False
         
+
+    def value_to_int(card):
+        """Function to translate a card's value to a numeric value (i.e., value: "2" --> 2, value: "King" --> 10)
+
+        Parameters:
+
+        card (Card object): Card to translate its value into a number
+
+        Return:
+
+        int:Numeric value of given card
+        """
+
+        # If K, J or Q, return value 10
+        if card.value in ["King", "Queen", "Jack"]:
+            return 10
+        # If Ace, return value 1 (value 11 checked in hand_total function)
+        elif card.value == "Ace":
+            return 1
+        # Otherwise, cast value into an int and return that (ex. card.value="2" --> return 2)
+        else:
+            return int(card.value)
+
 
     def hand_total(hand):
         """Determine the total of a given hand
 
         Parameters:
 
-        hand (list of ints): The hand that the player was given, represented as a list of integers
+        hand (list of Card objects): The hand that the Dealer was given, represented as a list of Card objects
 
         Returns:
 
         list of ints:Totals of current hand
         """
         
+        # If the hand is soft, account for two different totals
         if Dealer.is_soft(hand):
             total = [0, 0]
 
-            for val in hand:
+            for card in hand:
+                # Convert card's string value into a numeric value
+                val = Dealer.value_to_int(card.value)
+
                 # Case where we encountered an Ace
                 if (val == 1):
                     total[0] += 11
@@ -61,8 +92,17 @@ class Dealer:
             
             return total
 
+        # Hand is hard, return the sum of all card's values
         else:
-            return list(sum(hand))
+            total = 0
+
+            for card in hand:
+                # Convert card's string value into a numeric value
+                val = Dealer.value_to_int(card.value)
+
+                total += val
+
+            return list(total)
     
     def valid_total(totals):
         """Determine what total to return
@@ -105,15 +145,8 @@ class Dealer:
         void
         """
 
-        # Reformatting hand structure such that Aces show up as A and not 1
-        formatted_hand = []
-        for val in hand:
-            if val == 1:
-                formatted_hand.append("A")
-            else:
-                formatted_hand.append(str(val))
-        
-        hand_str = "|".join(formatted_hand)
+        # Join all cards together in a string
+        hand_str = "|".join(hand)
 
         print("Dealer's Cards: {}\nDealer's Decision: {}".format(hand_str, decision))
     

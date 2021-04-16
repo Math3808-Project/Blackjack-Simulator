@@ -277,7 +277,10 @@ class Player:
                     decision = definitions.Actions.STAND
             
             if total >= 20:
-                decision = definitions.Actions.STAND
+                if total == 21 and len(hand) == 2:
+                    decision = definitions.Actions.BLACKJACK
+                else:
+                    decision = definitions.Actions.STAND
         
 
         # Case for Splits

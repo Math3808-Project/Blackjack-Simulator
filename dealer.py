@@ -173,6 +173,10 @@ class Dealer:
         if total < 17:
             decision = definitions.Actions.HIT
         
+        # check for blackjack
+        if total == 21 and len(hand) == 2:
+            decision = definitions.Actions.BLACKJACK
+
         # If dev mode set, print out dealer's hand and resultant decision
         if Dealer.dev_mode:
             Dealer.print_decision(hand, decision)

@@ -2,6 +2,9 @@
 
 Final Project - MATH 3808 W21
 
+# Instructions for Use 
+- Coming soon
+
 ## Project Info
 
 ### Members
@@ -15,6 +18,9 @@ Final Project - MATH 3808 W21
 
 ### Due Date
 April 23rd 2021 at 14:00
+
+### Dependencies 
+- [PyDealer](https://pydealer.readthedocs.io/)
 
 # Description
 

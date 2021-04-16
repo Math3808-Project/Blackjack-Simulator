@@ -7,7 +7,7 @@ Final Project - MATH 3808 W21
 ### Members
 - Eren Sulutas - 101101873
 - Nabeel Warsalee - 101103167
-- Cailyn Edwards
+- Cailyn Edwards - 100956026
 - Henry Wang
 
 ### Professor

@@ -7,6 +7,7 @@
 
 
 import definitions
+import pydealer
 
 class Player:
     """Class that represents the Player of a BlackJack game (excl. Dealer)
@@ -26,23 +27,27 @@ class Player:
 
         Parameters:
 
-        hand (list of ints): The hand that the player was given, represented as a list of integers
+        hand (list of Card objects): The hand that the player was given, represented as a list of Card objects
 
         Returns:
 
         bool:Whether given hand is soft or not
         """
 
-        return 1 in hand
+        for card in hand:
+            if card.value == "Ace":
+                return True
+
+        return False
 
     def is_pair(hand, card_type):
         """Checks whether the hand is a pair of a specific type
 
         Parameters:
 
-        hand (list of ints): The hand that the player was given, represented as a list of integers
+        hand (list of Card objects): The hand that the player was given, represented as a list of Card objects
 
-        card_type (int) : The face value to check whether it appears as pair (i.e. if type=3, then check if hand is pair 3)
+        card_type (string) : The face value to check whether it appears as pair
 
         Returns:
 
@@ -55,12 +60,34 @@ class Player:
 
         # Go through each card and check whether all cards match to the specific type
         for card in hand:
-            if card != card_type:
+            if card.value != card_type:
                 return False
 
-        # If none of aboce failed, means we have a pair of the specific type
+        # If none of above failed, means we have a pair of the specific type
         return True
         
+
+    def value_to_int(card):
+        """Function to translate a card's value to a numeric value (i.e., value: "2" --> 2, value: "King" --> 10)
+
+        Parameters:
+
+        card (Card object): Card to translate its value into a number
+
+        Return:
+
+        int:Numeric value of given card
+        """
+
+        # If K, J or Q, return value 10
+        if card.value in ["King", "Queen", "Jack"]:
+            return 10
+        # If Ace, return value 1 (value 11 checked in hand_total function)
+        elif card.value == "Ace":
+            return 1
+        # Otherwise, cast value into an int and return that (ex. card.value="2" --> return 2)
+        else:
+            return int(card.value)
 
 
     def hand_total(hand):
@@ -68,17 +95,21 @@ class Player:
 
         Parameters:
 
-        hand (list of ints): The hand that the player was given, represented as a list of integers
+        hand (list of Card objects): The hand that the player was given, represented as a list of Card objects
 
         Returns:
 
-        int:Total of current hand
+        list of ints:Totals of current hand
         """
         
+        # If the hand is soft, account for two different totals
         if Player.is_soft(hand):
             total = [0, 0]
 
-            for val in hand:
+            for card in hand:
+                # Convert card's string value into a numeric value
+                val = Player.value_to_int(card.value)
+
                 # Case where we encountered an Ace
                 if (val == 1):
                     total[0] += 11
@@ -89,8 +120,17 @@ class Player:
             
             return total
 
+        # Hand is hard, return the sum of all card's values
         else:
-            return list(sum(hand))
+            total = 0
+
+            for card in hand:
+                # Convert card's string value into a numeric value
+                val = Player.value_to_int(card.value)
+
+                total += val
+
+            return list(total)
     
 
     def valid_total(totals):
@@ -135,15 +175,8 @@ class Player:
         void
         """
 
-        # Reformatting hand structure such that Aces show up as A and not 1
-        formatted_hand = []
-        for val in hand:
-            if val == 1:
-                formatted_hand.append("A")
-            else:
-                formatted_hand.append(str(val))
-        
-        hand_str = "|".join(formatted_hand)
+        # Join all cards together in a string
+        hand_str = "|".join(hand)
 
         print("Player's Cards: {}\nPlayer's Decision: {}".format(hand_str, decision))
 
@@ -169,85 +202,132 @@ class Player:
         # Var to store hand total
         total = Player.valid_total(Player.hand_total(hand))
 
-        # Case for all Hard hands (i.e. no Ace in hand)
+        # Var to store numeric value of dealer's upcard 
+        dealer_up_val = Player.value_to_int(dealer_upcard)
+
+        # TODO: Rework basic strategy logic.
+
+        # Case for Hard Hands
         if not Player.is_soft(hand):
-            # if total less than 11, always hit
-            if total <= 11:
-                decision = definitions.Actions.HIT
-            # if total 12, check dealer's upcard for specific cases
-            if total == 12:
-                if dealer_upcard in range(4, 7):
-                    decision = definitions.Actions.STAND
-                
-                # Execption, Always hit on total 12 with dealer upcard of 2 or 3
-                if dealer_upcard in range(2, 4):
-                    decision = definitions.Actions.HIT
-
-            # Case where total between 13-16 and dealer upcard is 2-6 (stand case)
-            if total in range(13, 17) and dealer_upcard in range (2, 7):
-                decision = definitions.Actions.STAND
-
-            if total in range(13, 17) and dealer_upcard > 6:
+            if total in range(5, 8):
                 decision = definitions.Actions.HIT
             
-            # ALways stand on total 17 or higher
+            if total == 8:
+                if dealer_up_val in range(5, 7):
+                    decision = definitions.Actions.DOUBLE
+                else:
+                    decision = definitions.Actions.HIT
+            
+            if total == 9:
+                if dealer_up_val in range(2, 7):
+                    decision = definitions.Actions.DOUBLE
+                else:
+                    decision = definitions.Actions.HIT
+            
+            if total == 10:
+                if dealer_up_val in range(2, 10):
+                    decision = definitions.Actions.DOUBLE
+                else:
+                    decision = definitions.Actions.HIT
+            
+            if total == 11:
+                decision = definitions.Actions.DOUBLE
+
+            if total == 12:
+                if dealer_up_val in range(4, 7):
+                    decision = definitions.Actions.STAND
+                else:
+                    decision = definitions.Actions.HIT
+            
+            if total in range(13, 17):
+                if dealer_up_val in range(2, 7):
+                    decision = definitions.Actions.STAND
+                else:
+                    decision = definitions.Actions.HIT
+            
             if total >= 17:
                 decision = definitions.Actions.STAND
 
-        # Case for all Soft hands (i.e. no Ace in hand)
+        # Case for Soft Hands
         else:
-
-            if total <= 17:
-                decision = definitions.Actions.HIT
+            if total in range(13, 17):
+                if dealer_up_val in range(4, 7):
+                    decision = definitions.Actions.DOUBLE
+                else:
+                    decision = definitions.Actions.HIT
             
-            if total == 18 and dealer_upcard <= 8:
-                decision = definitions.Actions.STAND
+            if total == 17:
+                if dealer_up_val in range(2, 7):
+                    decision = definitions.Actions.DOUBLE
+                else:
+                    decision = definitions.Actions.HIT
+
+            if total == 18:
+                if dealer_up_val in range(3, 7):
+                    decision = definitions.Actions.DOUBLE
+                elif dealer_up_val in range(9, 11):
+                    decision = definitions.Actions.HIT
+                else:
+                    decision = definitions.Actions.STAND
             
-            if total == 18 and dealer_upcard in range(9, 11):
+            if total == 19:
+                if dealer_up_val == 6:
+                    decision = definitions.Actions.DOUBLE
+                else:
+                    decision = definitions.Actions.STAND
+            
+            if total >= 20:
+                if total == 21 and len(hand) == 2:
+                    decision = definitions.Actions.BLACKJACK
+                else:
+                    decision = definitions.Actions.STAND
+        
+
+        # Case for Splits
+
+        if Player.is_pair(hand, "2"):
+            if dealer_up_val in range(2, 8):
+                decision = definitions.Actions.SPLIT
+            else:
                 decision = definitions.Actions.HIT
-
-            if total > 18:
+        
+        if Player.is_pair(hand, "3"):
+            if dealer_up_val in range(2, 9):
+                decision = definitions.Actions.SPLIT
+            else:
+                decision = definitions.Actions.HIT
+        
+        if Player.is_pair(hand, "4"):
+            if dealer_up_val in range(4, 7):
+                decision = definitions.Actions.SPLIT
+            else:
+                decision = definitions.Actions.HIT
+        
+        if Player.is_pair(hand, "6"):
+            if dealer_up_val in range(2, 8):
+                decision = definitions.Actions.SPLIT
+            else:
+                decision = definitions.Actions.HIT
+        
+        if Player.is_pair(hand, "7"):
+            if dealer_up_val == 9 or dealer_upcard.value == "Ace":
+                decision = definitions.Actions.HIT
+            elif dealer_up_val == 10:
                 decision = definitions.Actions.STAND
-
-        # DOUBLE DOWN, set of cases
-
-        if total == 11:
-            decision = definitions.Actions.DOUBLE
-
-        elif total == 10 and dealer_upcard in range(2, 10):
-            decision = definitions.Actions.DOUBLE
+            else:
+                decision = definitions.Actions.SPLIT
         
-        elif total == 9 and dealer_upcard in range(2, 7):
-            decision = definitions.Actions.DOUBLE
-
-        elif total == 8 and dealer_upcard in range(5, 7):
-            decision = definitions.Actions.DOUBLE
-
-        # SPLIT, set of cases
-
-        # If pair of Aces or pair of 8's, always split
-        if Player.is_pair(hand, 1) or Player.is_pair(hand, 8):
-            decision = definitions.Actions.SPLIT
-
-        elif Player.is_pair(hand, 2) and dealer_upcard in range(3, 8):
-            decision = definitions.Actions.SPLIT
-
-        elif Player.is_pair(hand, 3) and dealer_upcard in range(3, 8):
+        if Player.is_pair(hand, "8"):
             decision = definitions.Actions.SPLIT
         
-        elif Player.is_pair(hand, 6) and dealer_upcard in range(2, 7):
-            decision = definitions.Actions.SPLIT
-        
-        elif Player.is_pair(hand, 7) and dealer_upcard in range(2, 8):
-            decision = definitions.Actions.SPLIT
-        
-        elif Player.is_pair(hand, 9) and dealer_upcard in range(2, 9):
-            if dealer_upcard != 7:
+        if Player.is_pair(hand, "9"):
+            if dealer_up_val == 7 or dealer_up_val == 10 or dealer_upcard.value == "Ace":
+                decision = definitions.Actions.STAND
+            else:
                 decision = definitions.Actions.SPLIT
 
-        # If dev mode set, print out dealer's hand and resultant decision
-        if Player.dev_mode:
-            Player.print_decision(hand, decision)
+        if Player.is_pair(hand, "Ace"):
+            decision = definitions.Actions.SPLIT
 
         # return determined decision
         return decision

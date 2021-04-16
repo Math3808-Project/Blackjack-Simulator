@@ -254,7 +254,7 @@ class Player:
                 if dealer_up_val in range(4, 7):
                     decision = definitions.Actions.DOUBLE
                 else:
-                    decision = definitions.Actions.STAND
+                    decision = definitions.Actions.HIT
             
             if total == 17:
                 if dealer_up_val in range(2, 7):

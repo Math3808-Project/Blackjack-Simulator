@@ -72,7 +72,7 @@ class Player:
 
         Returns:
 
-        int:Total of current hand
+        list of ints:Totals of current hand
         """
         
         if Player.is_soft(hand):

@@ -29,3 +29,8 @@ From these multiple trials, we extract the win/lose probabilities for both Deale
 - Split up to four hands
 - Double down on any two initial cards, except for split Aces
 - Surrender not permitted 
+
+# Basic Strategy Used
+![image](https://user-images.githubusercontent.com/28713150/115052421-ee53d600-9eab-11eb-8bb7-58221b2db225.png)
+
+[Source](https://wizardofodds.com/games/blackjack/strategy/1-deck/)

@@ -33,34 +33,7 @@ class Dealer:
         """
 
         return 1 in hand
-
-    def is_pair(hand, card_type):
-        """Checks whether the hand is a pair of a specific type
-
-        Parameters:
-
-        hand (list of ints): The hand that the player was given, represented as a list of integers
-
-        card_type (int) : The face value to check whether it appears as pair (i.e. if type=3, then check if hand is pair 3)
-
-        Returns:
-
-        bool:Whether given hand is a pair of specific type
-        """
-
-        # If hand has more than two cards, automatically cannot be a pair
-        if len(hand) > 2:
-            return False
-
-        # Go through each card and check whether all cards match to the specific type
-        for card in hand:
-            if card != card_type:
-                return False
-
-        # If none of aboce failed, means we have a pair of the specific type
-        return True
         
-
 
     def hand_total(hand):
         """Determine the total of a given hand
@@ -71,7 +44,7 @@ class Dealer:
 
         Returns:
 
-        int:Total of current hand
+        list of ints:Totals of current hand
         """
         
         if Dealer.is_soft(hand):
@@ -91,7 +64,6 @@ class Dealer:
         else:
             return list(sum(hand))
     
-
     def valid_total(totals):
         """Determine what total to return
 
@@ -168,7 +140,6 @@ class Dealer:
         if total < 17:
             decision = definitions.Actions.HIT
         
-
         # If dev mode set, print out dealer's hand and resultant decision
         if Dealer.dev_mode:
             Dealer.print_decision(hand, decision)

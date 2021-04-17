@@ -6,6 +6,7 @@
 # Represents the dealer of the Blackjack game which uses the dealer's default strategy
 
 import definitions
+import pydealer
 
 class Dealer:
     """Class that represents the Dealer of a BlackJack game
@@ -17,10 +18,10 @@ class Dealer:
 
     """
 
-    def __init__(dev_mode=False):
-        Dealer.dev_mode = dev_mode
+    def __init__(self, dev_mode=False):
+        self.dev_mode = dev_mode
     
-    def is_soft(hand):
+    def is_soft(self, hand):
         """Checks whether an Ace is contained within the given hand, meaning the current hand is a soft hand
 
         Parameters:
@@ -39,7 +40,7 @@ class Dealer:
         return False
         
 
-    def value_to_int(card):
+    def value_to_int(self, card):
         """Function to translate a card's value to a numeric value (i.e., value: "2" --> 2, value: "King" --> 10)
 
         Parameters:
@@ -62,7 +63,7 @@ class Dealer:
             return int(card.value)
 
 
-    def hand_total(hand):
+    def hand_total(self, hand):
         """Determine the total of a given hand
 
         Parameters:
@@ -75,12 +76,12 @@ class Dealer:
         """
         
         # If the hand is soft, account for two different totals
-        if Dealer.is_soft(hand):
+        if self.is_soft(hand):
             total = [0, 0]
 
             for card in hand:
                 # Convert card's string value into a numeric value
-                val = Dealer.value_to_int(card.value)
+                val = self.value_to_int(card.value)
 
                 # Case where we encountered an Ace
                 if (val == 1):
@@ -98,13 +99,13 @@ class Dealer:
 
             for card in hand:
                 # Convert card's string value into a numeric value
-                val = Dealer.value_to_int(card.value)
+                val = self.value_to_int(card.value)
 
                 total += val
 
             return list(total)
     
-    def valid_total(totals):
+    def valid_total(self, totals):
         """Determine what total to return
 
         Parameters:
@@ -131,7 +132,7 @@ class Dealer:
             else:
                 return curr_max
             
-    def print_decision(hand, decision):
+    def print_decision(self, hand, decision):
         """Print out current hand and decision that is given
 
         Parameters:
@@ -150,7 +151,7 @@ class Dealer:
 
         print("Dealer's Cards: {}\nDealer's Decision: {}".format(hand_str, decision))
     
-    def compute_play(hand):
+    def compute_play(self, hand):
         """Computes the dealer's decision based on their given BlackJack hand
 
         Parameters:
@@ -167,7 +168,7 @@ class Dealer:
         decision = definitions.Actions.STAND
 
         # Var to store hand total
-        total = Dealer.valid_total(Dealer.hand_total(hand))
+        total = self.valid_total(self.hand_total(hand))
 
         # any total less than 17 dealer hits
         if total < 17:
@@ -178,8 +179,8 @@ class Dealer:
             decision = definitions.Actions.BLACKJACK
 
         # If dev mode set, print out dealer's hand and resultant decision
-        if Dealer.dev_mode:
-            Dealer.print_decision(hand, decision)
+        if self.dev_mode:
+            self.print_decision(hand, decision)
 
         return decision
         

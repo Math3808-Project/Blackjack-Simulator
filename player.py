@@ -18,11 +18,11 @@ class Player:
     dev_mode (bool): Flag that indicates developer mode. In developer mode all debug and print statements will display.
 
     """
-    def __init__(dev_mode=False):
-        Player.dev_mode = dev_mode
+    def __init__(self, dev_mode=False):
+        self.dev_mode = dev_mode
 
     
-    def is_soft(hand):
+    def is_soft(self, hand):
         """Checks whether an Ace is contained within the given hand, meaning the current hand is a soft hand
 
         Parameters:
@@ -40,7 +40,7 @@ class Player:
 
         return False
 
-    def is_pair(hand, card_type):
+    def is_pair(self, hand, card_type):
         """Checks whether the hand is a pair of a specific type
 
         Parameters:
@@ -67,7 +67,7 @@ class Player:
         return True
         
 
-    def value_to_int(card):
+    def value_to_int(self, card):
         """Function to translate a card's value to a numeric value (i.e., value: "2" --> 2, value: "King" --> 10)
 
         Parameters:
@@ -90,7 +90,7 @@ class Player:
             return int(card.value)
 
 
-    def hand_total(hand):
+    def hand_total(self, hand):
         """Determine the total of a given hand
 
         Parameters:
@@ -103,12 +103,12 @@ class Player:
         """
         
         # If the hand is soft, account for two different totals
-        if Player.is_soft(hand):
+        if self.is_soft(hand):
             total = [0, 0]
 
             for card in hand:
                 # Convert card's string value into a numeric value
-                val = Player.value_to_int(card.value)
+                val = self.value_to_int(card)
 
                 # Case where we encountered an Ace
                 if (val == 1):
@@ -122,18 +122,18 @@ class Player:
 
         # Hand is hard, return the sum of all card's values
         else:
-            total = 0
+            hand_sum = 0
 
             for card in hand:
                 # Convert card's string value into a numeric value
-                val = Player.value_to_int(card.value)
+                val = self.value_to_int(card)
 
-                total += val
+                hand_sum += val
 
-            return list(total)
+            return [hand_sum]
     
 
-    def valid_total(totals):
+    def valid_total(self, totals):
         """Determine what total to return
 
         Parameters:
@@ -161,12 +161,14 @@ class Player:
                 return curr_max
     
 
-    def print_decision(hand, decision):
+    def print_decision(self, hand, dealers, decision):
         """Print out current hand and decision that is given
 
         Parameters:
 
-        hand (list of ints): The hand that the player was given, represented as a list of integers
+        hand (list of Card objects): The hand that the player was given, represented as a list of Card objects
+
+        dealers (Card object): The Dealer's upcard
 
         decision (Actions enum): Decision that was made by the player
 
@@ -175,20 +177,17 @@ class Player:
         void
         """
 
-        # Join all cards together in a string
-        hand_str = "|".join(hand)
-
-        print("Player's Cards: {}\nPlayer's Decision: {}".format(hand_str, decision))
+        print("Player's Cards:\n{}\nDealer's Card: {} \nPlayer's Decision: {}".format(hand, dealers, decision))
 
 
-    def compute_play(hand, dealer_upcard):
+    def compute_play(self, hand, dealer_upcard):
         """Computes the player's decision based on their given BlackJack hand (uses Basic Strategy)
 
         Parameters:
 
-        hand (list of ints): The hand that the player was given, represented as a list of integers
+        hand (list of Card Objects): The hand that the player was given, represented as a list of Card objects
 
-        dealer_upcard (int): The value of the dealer's exposed card
+        dealer_upcard (Card Object): The value of the dealer's exposed card, as a Card object
 
         Returns:
 
@@ -200,15 +199,15 @@ class Player:
         decision = definitions.Actions.HIT
 
         # Var to store hand total
-        total = Player.valid_total(Player.hand_total(hand))
+        total = self.valid_total(self.hand_total(hand))
 
         # Var to store numeric value of dealer's upcard 
-        dealer_up_val = Player.value_to_int(dealer_upcard)
+        dealer_up_val = self.value_to_int(dealer_upcard)
 
         # TODO: Rework basic strategy logic.
 
         # Case for Hard Hands
-        if not Player.is_soft(hand):
+        if not self.is_soft(hand):
             if total in range(5, 8):
                 decision = definitions.Actions.HIT
             
@@ -285,31 +284,31 @@ class Player:
 
         # Case for Splits
 
-        if Player.is_pair(hand, "2"):
+        if self.is_pair(hand, "2"):
             if dealer_up_val in range(2, 8):
                 decision = definitions.Actions.SPLIT
             else:
                 decision = definitions.Actions.HIT
         
-        if Player.is_pair(hand, "3"):
+        if self.is_pair(hand, "3"):
             if dealer_up_val in range(2, 9):
                 decision = definitions.Actions.SPLIT
             else:
                 decision = definitions.Actions.HIT
         
-        if Player.is_pair(hand, "4"):
+        if self.is_pair(hand, "4"):
             if dealer_up_val in range(4, 7):
                 decision = definitions.Actions.SPLIT
             else:
                 decision = definitions.Actions.HIT
         
-        if Player.is_pair(hand, "6"):
+        if self.is_pair(hand, "6"):
             if dealer_up_val in range(2, 8):
                 decision = definitions.Actions.SPLIT
             else:
                 decision = definitions.Actions.HIT
         
-        if Player.is_pair(hand, "7"):
+        if self.is_pair(hand, "7"):
             if dealer_up_val == 9 or dealer_upcard.value == "Ace":
                 decision = definitions.Actions.HIT
             elif dealer_up_val == 10:
@@ -317,17 +316,21 @@ class Player:
             else:
                 decision = definitions.Actions.SPLIT
         
-        if Player.is_pair(hand, "8"):
+        if self.is_pair(hand, "8"):
             decision = definitions.Actions.SPLIT
         
-        if Player.is_pair(hand, "9"):
+        if self.is_pair(hand, "9"):
             if dealer_up_val == 7 or dealer_up_val == 10 or dealer_upcard.value == "Ace":
                 decision = definitions.Actions.STAND
             else:
                 decision = definitions.Actions.SPLIT
 
-        if Player.is_pair(hand, "Ace"):
+        if self.is_pair(hand, "Ace"):
             decision = definitions.Actions.SPLIT
+
+        # If dev mode set, print out dealer's hand and resultant decision
+        if self.dev_mode:
+            self.print_decision(hand, dealer_upcard, decision)
 
         # return determined decision
         return decision

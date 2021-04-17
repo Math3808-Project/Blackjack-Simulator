@@ -81,7 +81,7 @@ class Dealer:
 
             for card in hand:
                 # Convert card's string value into a numeric value
-                val = self.value_to_int(card.value)
+                val = self.value_to_int(card)
 
                 # Case where we encountered an Ace
                 if (val == 1):
@@ -99,11 +99,11 @@ class Dealer:
 
             for card in hand:
                 # Convert card's string value into a numeric value
-                val = self.value_to_int(card.value)
+                val = self.value_to_int(card)
 
                 total += val
 
-            return list(total)
+            return [total]
     
     def valid_total(self, totals):
         """Determine what total to return

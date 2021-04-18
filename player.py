@@ -180,7 +180,7 @@ class Player:
         print("Player's Cards:\n{}\nDealer's Card: {} \nPlayer's Decision: {}".format(hand, dealers, decision))
 
 
-    def compute_play(self, hand, dealer_upcard):
+    def compute_play(self, hand, dealer_upcard, split_aces=False):
         """Computes the player's decision based on their given BlackJack hand (uses Basic Strategy)
 
         Parameters:
@@ -204,8 +204,6 @@ class Player:
         # Var to store numeric value of dealer's upcard 
         dealer_up_val = self.value_to_int(dealer_upcard)
 
-        # TODO: Rework basic strategy logic.
-
         # Case for Hard Hands
         if not self.is_soft(hand):
             if total in range(5, 8):
@@ -213,24 +211,36 @@ class Player:
             
             if total == 8:
                 if dealer_up_val in range(5, 7):
-                    decision = definitions.Actions.DOUBLE
+                    if split_aces:
+                        decision = definitions.Actions.HIT
+                    else:
+                        decision = definitions.Actions.DOUBLE
                 else:
                     decision = definitions.Actions.HIT
             
             if total == 9:
                 if dealer_up_val in range(2, 7):
-                    decision = definitions.Actions.DOUBLE
+                    if split_aces:
+                        decision = definitions.Actions.HIT
+                    else:
+                        decision = definitions.Actions.DOUBLE
                 else:
                     decision = definitions.Actions.HIT
             
             if total == 10:
                 if dealer_up_val in range(2, 10):
-                    decision = definitions.Actions.DOUBLE
+                    if split_aces:
+                        decision = definitions.Actions.HIT
+                    else:
+                        decision = definitions.Actions.DOUBLE
                 else:
                     decision = definitions.Actions.HIT
             
             if total == 11:
-                decision = definitions.Actions.DOUBLE
+                if split_aces:
+                    decision = definitions.Actions.HIT
+                else:
+                    decision = definitions.Actions.DOUBLE
 
             if total == 12:
                 if dealer_up_val in range(4, 7):
@@ -251,19 +261,28 @@ class Player:
         else:
             if total in range(13, 17):
                 if dealer_up_val in range(4, 7):
-                    decision = definitions.Actions.DOUBLE
+                    if split_aces:
+                        decision = definitions.Actions.HIT
+                    else:
+                        decision = definitions.Actions.DOUBLE
                 else:
                     decision = definitions.Actions.HIT
             
             if total == 17:
                 if dealer_up_val in range(2, 7):
-                    decision = definitions.Actions.DOUBLE
+                    if split_aces:
+                        decision = definitions.Actions.HIT
+                    else:
+                        decision = definitions.Actions.DOUBLE
                 else:
                     decision = definitions.Actions.HIT
 
             if total == 18:
                 if dealer_up_val in range(3, 7):
-                    decision = definitions.Actions.DOUBLE
+                    if split_aces:
+                        decision = definitions.Actions.STAND
+                    else:
+                        decision = definitions.Actions.DOUBLE
                 elif dealer_up_val in range(9, 11):
                     decision = definitions.Actions.HIT
                 else:
@@ -271,7 +290,10 @@ class Player:
             
             if total == 19:
                 if dealer_up_val == 6:
-                    decision = definitions.Actions.DOUBLE
+                    if split_aces:
+                        decision = definitions.Actions.STAND
+                    else:
+                        decision = definitions.Actions.DOUBLE
                 else:
                     decision = definitions.Actions.STAND
             

@@ -1,5 +1,7 @@
-import definitions
 import pydealer
+import definitions
+import player
+import dealer
 
 class Game:
     """
@@ -8,6 +10,8 @@ class Game:
 
     def __init__(self, dev_mode=False):
         self.dev_mode = dev_mode
+        self.player = player.Player(dev_mode)
+        self.dealer = dealer.Dealer(dev_mode)
 
     def game_result(self, bet=1, player_hand=None, dealer_hand=None, deck=None):
         """
@@ -57,21 +61,20 @@ class Game:
         if dealer_hand is None:
             dealer_hand = deck.deal()
 
-        print("Player hand")
-        print(player_hand)
-        print("\nDealer hand")
-        print(dealer_hand)     
-        print("\nDeck")
-        print(deck.size)
+        # for testing
+        if self.dev_mode:
+            self.print_info(player_hand, dealer_hand, deck.size)
+
+        player_action = self.player.compute_play(player_hand, dealer_hand[0], split_aces)
             
         # check for player Blackjack with initial hand
-        if "PLAYER_ACTION" == definitions.Actions.BLACKJACK:
+        if player_action == definitions.Actions.BLACKJACK:
             
             # check if dealer also has Blackjack -> tie
             if dealer_hand.size == 1:
                 dealer_hand.add(deck.deal())
 
-            if "DEALER_ACTION" == definitions.Actions.BLACKJACK:
+            if self.dealer.compute_play(dealer_hand) == definitions.Actions.BLACKJACK:
                 return 0
 
             # player gets 1.5 to 1 payout for Blackjack
@@ -81,26 +84,28 @@ class Game:
             # handle player decisions
 
             # hit
-            while "PLAYER_ACTION" == definitions.Actions.HIT:
+            while player_action == definitions.Actions.HIT:
                 # add card to player hand
                 player_hand.add(deck.deal())
 
                 # player busts on this draw and loses betting amount
-                if self.hand_sum(player_hand) > 21:
+                if self.player.hand_sum(player_hand) > 21:
                     return -1 * bet
 
+                player_action = self.player.compute_play(player_hand, dealer_hand[0], split_aces)
+
             # double
-            if "PLAYER_ACTION" == definitions.Actions.DOUBLE:
+            if player_action == definitions.Actions.DOUBLE:
                 # add single card to player hand
                 player_hand.add(deck.deal())
                 bet *= 2
 
                 # player busts on this draw and loses betting amount
-                if self.hand_sum(player_hand) > 21:
+                if self.player.hand_sum(player_hand) > 21:
                     return -1 * bet
 
             # split
-            if "PLAYER_ACTION" == definitions.Actions.SPLIT:
+            if player_action == definitions.Actions.SPLIT:
                 # make recursive calls and add the results of each hand
                 result  = self.game_result(bet, pydealer.Stack(cards = [player_hand[0]]), dealer_hand, deck)
                 result += self.game_result(bet, pydealer.Stack(cards = [player_hand[1]]), dealer_hand, deck)
@@ -110,90 +115,59 @@ class Game:
             # handle dealer decisions and final game outcome per draw 
             # precondition: player's hand is not busted
 
+            dealer_action = self.dealer.compute_play(dealer_hand)
+
             # hit, add card to dealer hand
-            if "DEALER_ACTION" == definitions.Actions.HIT:
+            if dealer_action == definitions.Actions.HIT:
                 dealer_hand.add(deck.deal())
 
             # blackjack for dealer and not player, player loses betting amount
-            if "DEALER_ACTION" == definitions.Actions.BLACKJACK:
+            elif dealer_action == definitions.Actions.BLACKJACK:
                 return -1 * bet
 
             # stand
-            if "DEALER_ACTION" == definitions.Actions.STAND:
-                dealer_sum = self.hand_sum(dealer_hand)
-                player_sum = self.hand_sum(player_hand)
+            elif dealer_action == definitions.Actions.STAND:
+                dealer_sum = self.dealer.hand_sum(dealer_hand)
+                player_sum = self.player.hand_sum(player_hand)
 
-                # dealer busts, player wins bet amount
+                # dealer busts, player wins bet amount 3 to 2
                 if dealer_sum > 21:
-                    return bet
+                    return 1.5 * bet
 
-                # dealer has higher hand
-                elif dealer_sum > player_sum:
+                # player has higher hand, player wins bet amount 3 to 2
+                elif player_sum > dealer_sum:
+                    return 1.5 * bet
+
+                # tie, player neither gains nor loses bet amount
+                elif player_sum == dealer_sum:
+                    return 0
+
+                # dealer has higher hand, player loses their bet
+                else:
                     return -1 * bet
 
-                # player has higher hand
-                elif player_sum> dealer_sum:
-                    return bet
-
-                # tie
-                else:
-                    return 0
-                       
-    def hand_sum(self, hand):
+    def print_info(self, player_hand, dealer_hand, num_cards):
         """
-        Generates the numerical sum of a playing hand
+        Prints the information for the start of a blackjack round
 
         Parmeters
         ---------
-        hand : Card list
-            The hand to calculate
+        player_hand : Card list
+            The  player hand
+            
+        dealer_hand : Card list
+            The  dealer hand      
+
+        num_cards : int
+            The number of cards remaining in the deck
 
         Returns
         -------
-        An integer representing the numerical sum of a blackjack hand
+        void
         """
-        sum = 0
 
-        for card in hand:
-            if card.value in ["King", "Queen", "Jack"]:
-                sum += 10
-            elif card.value == "Ace":
-                sum += 1
-            else:
-                sum += int(card.value)
-
-        return sum
-
-bj = Game()
-print(bj.game_result(1))
-
- # check if dealer also has Blackjack -> tie
-# dealer_hand.add(deck.deal())
-
-# for card in dealer_hand:
-#     if card.value == "Ace":
-#         if self.hand_sum(dealer_hand) == 11:
-#             return 0
-#         break
-
-print("\n-----absolute lunacy-----\n")
-
-# deck = pydealer.Deck()
-# deck.shuffle()
-
-# hand = deck.deal(2)
-# print(hand)
-
-# print(hand[0])
-# print(type([hand[0]])==list)
-
-# h = pydealer.Stack(cards = [hand[0]])
-# print(h)
-# a = pydealer.Stack()
-# if a is None:
-#     print("a")
-
-# b = None
-# if b is None:
-#     print("b")
-# bj.game_result(1, pydealer.Stack(cards = [hand[0]]), hand[1])
+        print("~~~Starting Player Hand~~~")
+        print(player_hand)
+        print("\n~~~Starting Dealer Hand~~~")
+        print(dealer_hand)     
+        print("\n~~~Starting Deck Size~~~\n{}".format(num_cards))

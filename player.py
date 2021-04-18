@@ -159,8 +159,23 @@ class Player:
                 return curr_min
             else:
                 return curr_max
-    
 
+    def hand_sum(self, hand):
+        """
+        Generates the numerical sum of a playing hand
+
+        Parmeters
+        ---------
+        hand : Card list
+            The hand to calculate
+
+        Returns
+        -------
+        int : An integer representing the numerical sum of a blackjack hand
+        """
+
+        return self.valid_total(self.hand_total(hand))
+    
     def print_decision(self, hand, dealers, decision):
         """Print out current hand and decision that is given
 
@@ -177,7 +192,7 @@ class Player:
         void
         """
 
-        print("Player's Cards:\n{}\nDealer's Card: {} \nPlayer's Decision: {}".format(hand, dealers, decision))
+        print("\n___Player's Cards___\n{}\nDealer's Card: {} \nPlayer's Decision: {}".format(hand, dealers, decision))
 
 
     def compute_play(self, hand, dealer_upcard, split_aces=False):
@@ -199,7 +214,7 @@ class Player:
         decision = definitions.Actions.HIT
 
         # Var to store hand total
-        total = self.valid_total(self.hand_total(hand))
+        total = self.hand_sum(hand)
 
         # Var to store numeric value of dealer's upcard 
         dealer_up_val = self.value_to_int(dealer_upcard)

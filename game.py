@@ -90,6 +90,10 @@ class Game:
 
                 # player busts on this draw and loses betting amount
                 if self.player.hand_sum(player_hand) > 21:
+                    # for testing
+                    if self.dev_mode:
+                        print("\n___Player's Cards___\n{}".format(player_hand))
+
                     return -1 * bet
 
                 player_action = self.player.compute_play(player_hand, dealer_hand[0], split_aces)
@@ -99,6 +103,10 @@ class Game:
                 # add single card to player hand
                 player_hand.add(deck.deal())
                 bet *= 2
+
+                # for testing
+                if self.dev_mode:
+                    print("\n___Player's Cards___\n{}".format(player_hand))
 
                 # player busts on this draw and loses betting amount
                 if self.player.hand_sum(player_hand) > 21:
@@ -129,6 +137,10 @@ class Game:
             elif dealer_action == definitions.Actions.STAND:
                 dealer_sum = self.dealer.hand_sum(dealer_hand)
                 player_sum = self.player.hand_sum(player_hand)
+                
+                # for testing
+                if self.dev_mode:
+                    print("\nDealer sum: {}\nPlayer sum: {}".format(dealer_sum, player_sum))
 
                 # dealer busts, player wins bet amount 3 to 2
                 if dealer_sum > 21:
@@ -166,7 +178,7 @@ class Game:
         void
         """
 
-        print("~~~Starting Player Hand~~~")
+        print("\n~~~Starting Player Hand~~~")
         print(player_hand)
         print("\n~~~Starting Dealer Hand~~~")
         print(dealer_hand)     

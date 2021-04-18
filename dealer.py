@@ -123,9 +123,8 @@ class Dealer:
             curr_max = max(totals)
             curr_min = min(totals)
 
-            # error case
             if curr_max > 21 and curr_min > 21:
-                return None
+                return curr_min
             
             if curr_max > 21:
                 return curr_min

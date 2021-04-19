@@ -37,16 +37,14 @@ class Game:
         A float value representing the player net amount, initial bet included
         """
 
-        # initialize the dictionary storing game result data
-        game_info = self.init_dict()
-
         # create deck if not inputted 
         if deck is None:
             deck = pydealer.Deck()
             deck.shuffle()
 
-        # condition for split aces 
-        split_aces = False
+        # gameplay conditions
+        double_down = False
+        split_aces  = False
 
         # draw player hand if hand not inputted
         if player_hand is None:
@@ -75,24 +73,26 @@ class Game:
         # check for player Blackjack with initial hand
         if player_action == definitions.Actions.BLACKJACK:
             # check if dealer also has Blackjack -> tie
-            game_info["player_sum"] = [21]
-            game_info["dealer_sum"] = self.dealer.hand_sum(dealer_hand)
 
             if dealer_action == definitions.Actions.BLACKJACK:
-                game_info["result"] = 0
-                return game_info
+                return self.make_result_dict(
+                    result      = 0, 
+                    player_sum  = [21],
+                    dealer_sum  = 21,
+                    blackjack   = True)
 
             # player gets 1.5 to 1 payout for Blackjack
-            game_info["result"] = 1.5 * bet
-            return game_info
+            return self.make_result_dict(
+                result      = 1.5 * bet, 
+                player_sum  = [21],
+                blackjack   = True)
 
         # checks for dealer blackjack with initial hand
         elif dealer_action == definitions.Actions.BLACKJACK:
-            game_info["player_sum"] = self.player.hand_sum(player_hand)
-            game_info["dealer_sum"] = 21
-            game_info["result"] = -1 * bet
-
-            return game_info
+            return self.make_result_dict(
+                result      = -1 * bet,
+                dealer_sum  = 21,
+                blackjack   = True)
 
         else:
             # handle player decisions
@@ -106,20 +106,20 @@ class Game:
 
                 # player busts on this draw and loses betting amount
                 if player_sum > 21:
-                    game_info["player_sum"] = [player_sum]
-                    game_info["result"] = -1 * bet
-
+                
                     # for testing
                     if self.dev_mode:
                         print("\n___Player's Cards After Bust___\n{}".format(player_hand))
 
-                    return game_info
+                    return self.make_result_dict(
+                        result      = -1 * bet, 
+                        player_sum  = [player_sum])
 
                 player_action = self.player.compute_play(player_hand, dealer_hand[0], split_aces)
 
             # double
             if player_action == definitions.Actions.DOUBLE:
-                game_info["double_down"] = True
+                double_down = True
 
                 # add single card to player hand
                 player_hand.add(deck.deal())
@@ -133,9 +133,10 @@ class Game:
 
                 # player busts on this draw and loses betting amount
                 if player_sum > 21:
-                    game_info["player_sum"] = [player_sum]
-                    game_info["result"] = -1 * bet
-                    return game_info
+                    return self.make_result_dict(
+                        result      = -1 * bet, 
+                        player_sum  = [player_sum],
+                        double_down = double_down)
 
             # split
             if player_action == definitions.Actions.SPLIT:
@@ -144,12 +145,11 @@ class Game:
                 result2 = self.game_result(bet, pydealer.Stack(cards = [player_hand[1]]), dealer_hand, deck)
 
                 # combine the two into a single dict
-                game_info["result"]     = result1["result"] + result2["result"]
-                game_info["player_sum"] = result1["player_sum"] + result2["player_sum"]
-                game_info["dealer_sum"] = result1["dealer_sum"] if result1["dealer_sum"] > result2["dealer_sum"] else result2["dealer_sum"]
-                game_info["split"]      = True
-
-                return game_info
+                return self.make_result_dict(
+                    result      = result1["result"] + result2["result"], 
+                    player_sum  = result1["player_sum"] + result2["player_sum"],
+                    dealer_sum  = result1["dealer_sum"] if result1["dealer_sum"] > result2["dealer_sum"] else result2["dealer_sum"],
+                    split       = True)
 
         while True:
             # handle dealer decisions and final game outcome per draw 
@@ -162,17 +162,11 @@ class Game:
                 # compute next dealer action
                 dealer_action = self.dealer.compute_play(dealer_hand)
 
-            # blackjack for dealer and not player, player loses betting amount
-            elif dealer_action == definitions.Actions.BLACKJACK:
-                game_info["result"] = -1 * bet
-                game_info["player_sum"] = [self.player.hand_sum(player_hand)]
-                game_info["dealer_sum"] = 21
-                return game_info
-
             # stand
             elif dealer_action == definitions.Actions.STAND:
-                dealer_sum = self.dealer.hand_sum(dealer_hand)
                 player_sum = self.player.hand_sum(player_hand)
+                dealer_sum = self.dealer.hand_sum(dealer_hand)
+                res = 0
                 
                 # for testing
                 if self.dev_mode:
@@ -180,44 +174,60 @@ class Game:
 
                 # dealer busts, player wins bet amount 
                 if dealer_sum > 21:
-                    game_info["result"] = bet
+                    res = bet
 
                 # player has higher hand, player wins bet amount 
                 elif player_sum > dealer_sum:
-                    game_info["result"] = bet
+                    res = bet
 
                 # tie, player neither gains nor loses bet amount
                 elif player_sum == dealer_sum:
-                    game_info["result"] = 0
+                    res = 0
 
                 # dealer has higher hand, player loses their bet
                 else:
-                    game_info["result"] = -1 * bet
+                    res = -1 * bet
 
-                game_info["player_sum"] = [player_sum]
-                game_info["dealer_sum"] = dealer_sum
+                return self.make_result_dict(
+                    result      = res, 
+                    player_sum  = [player_sum],
+                    dealer_sum  = dealer_sum,
+                    double_down = double_down)
                 
-                return game_info
-
-    def init_dict(self):
+    def make_result_dict(self, result=0, player_sum=[0], dealer_sum=0, blackjack=False, double_down=False, split=False):
         """
-        Returns an initialized dictionary to store game information 
+        Returns an dictionary that stores game information 
 
-        Returns
-        -------
-        A dictionary with the following keys: "result", "player_sum", "dealer_sum", "doubledown", "split"
-        
-        Where the player_sum is a list of sums for each hand the player has in the round 
-        """
-        game_info = {
+        Default values are as follows:
+
+        result_dict = {
             "result": 0,
             "player_sum": [0],
             "dealer_sum": 0,
+            "blackjack": False,
             "double_down": False,
             "split": False
         }
 
-        return game_info
+        Where the player_sum is a list of sums for each hand the player has in the round 
+
+        Both player_sum and dealer_sum represent the final card values. If they are zero, it means their sum was unused during the game.
+
+        Returns
+        -------
+        A dictionary with various game details
+        
+        """
+        result_dict = {
+            "result": result,
+            "player_sum": player_sum,
+            "dealer_sum": dealer_sum,
+            "blackjack": blackjack,
+            "double_down": double_down,
+            "split": split
+        }
+
+        return result_dict
     
     def print_info(self, player_hand, dealer_hand, num_cards):
         """

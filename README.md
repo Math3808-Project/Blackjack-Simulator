@@ -34,6 +34,7 @@ From these multiple trials, we extract the win/lose probabilities for both Deale
 - Dealer stands on any 17 (including soft 17)
 - Split up to four hands
 - Double down on any two initial cards, except for split Aces
+- Split Aces may not hit (stand after drawing second card)
 - Surrender not permitted 
 
 # Basic Strategy Used

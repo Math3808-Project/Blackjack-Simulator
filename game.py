@@ -91,7 +91,7 @@ class Game:
             # handle player decisions
 
             # hit
-            while player_action == definitions.Actions.HIT:
+            while player_action == definitions.Actions.HIT and not split_aces:
                 # add card to player hand
                 player_hand.add(deck.deal())
 

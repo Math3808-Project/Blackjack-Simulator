@@ -123,13 +123,24 @@ class Player:
         if self.has_ace(hand):
             total = [0, 0]
 
+            # var to store number of aces that are to be considered as 11 in the final total
+            num_of_full_aces = 1
+
             for card in hand:
                 # Convert card's string value into a numeric value
                 val = self.value_to_int(card)
 
                 # Case where we encountered an Ace
                 if (val == 1):
-                    total[0] += 11
+                    # If current Ace is the first ace we have seen, consider it with value 11 in calculations
+                    if num_of_full_aces > 0:
+                        total[0] += 11
+                        num_of_full_aces -= 1
+                    # Otherwise, this is not the first Ace we've seen meaning we should consider its value 1 so as not to bust the total
+                    else:
+                        total[0] += 1
+
+                    # Increase the smaller total with value 1
                     total[1] += 1
                 else:
                     total[0] += val
@@ -227,7 +238,7 @@ class Player:
         """
 
         # Var to store the player's decision for the current hand of cards 
-        decision = definitions.Actions.HIT
+        decision = definitions.Actions.NONE
 
         # Var to store hand total
         total = self.hand_sum(hand)
@@ -384,6 +395,9 @@ class Player:
         # If dev mode set, print out dealer's hand and resultant decision
         if self.dev_mode:
             self.print_decision(hand, dealer_upcard, decision)
+
+        if decision == definitions.Actions.NONE:
+            raise Exception("Actions value is NONE...")
 
         # return determined decision
         return decision

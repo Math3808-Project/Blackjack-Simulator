@@ -21,7 +21,7 @@ class Dealer:
     def __init__(self, dev_mode=False):
         self.dev_mode = dev_mode
     
-    def is_soft(self, hand):
+    def has_ace(self, hand):
         """Checks whether an Ace is contained within the given hand, meaning the current hand is a soft hand
 
         Parameters:
@@ -75,9 +75,12 @@ class Dealer:
         list of ints:Totals of current hand
         """
         
-        # If the hand is soft, account for two different totals
-        if self.is_soft(hand):
+        # If the hand has an ace, account for two different totals
+        if self.has_ace(hand):
             total = [0, 0]
+
+            # var to store number of aces that are to be considered as 11 in the final total
+            num_of_full_aces = 1
 
             for card in hand:
                 # Convert card's string value into a numeric value
@@ -85,7 +88,15 @@ class Dealer:
 
                 # Case where we encountered an Ace
                 if (val == 1):
-                    total[0] += 11
+                    # If current Ace is the first ace we have seen, consider it with value 11 in calculations
+                    if num_of_full_aces > 0:
+                        total[0] += 11
+                        num_of_full_aces -= 1
+                    # Otherwise, this is not the first Ace we've seen meaning we should consider its value 1 so as not to bust the total
+                    else:
+                        total[0] += 1
+
+                    # Increase the smaller total with value 1
                     total[1] += 1
                 else:
                     total[0] += val
@@ -93,7 +104,7 @@ class Dealer:
             
             return total
 
-        # Hand is hard, return the sum of all card's values
+        # Hand has no ace, return the sum of all card's values
         else:
             total = 0
 

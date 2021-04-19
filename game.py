@@ -170,13 +170,13 @@ class Game:
                 if self.dev_mode:
                     print("\nPlayer sum: {}\nDealer sum: {}".format(player_sum, dealer_sum))
 
-                # dealer busts, player wins bet amount 3 to 2
+                # dealer busts, player wins bet amount 
                 if dealer_sum > 21:
-                    game_info["result"] = 1.5 * bet
+                    game_info["result"] = bet
 
-                # player has higher hand, player wins bet amount 3 to 2
+                # player has higher hand, player wins bet amount 
                 elif player_sum > dealer_sum:
-                    game_info["result"] = 1.5 * bet
+                    game_info["result"] = bet
 
                 # tie, player neither gains nor loses bet amount
                 elif player_sum == dealer_sum:

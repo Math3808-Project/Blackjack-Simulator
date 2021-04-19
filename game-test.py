@@ -35,7 +35,7 @@ def main():
             # play game with the hand
             game_str = bj.game_result(bet=bet_amount, player_hand=hand, deck=deck)
 
-            print("\nPlayer Net Result After ${} Initial Bet: ${}\n".format(bet_amount, game_str["result"]))
+            print("\nPlayer Result After ${} Initial Bet: ${}\n".format(bet_amount, game_str["result"]))
         
     sys.stdout.close()
 

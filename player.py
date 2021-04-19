@@ -22,8 +22,8 @@ class Player:
         self.dev_mode = dev_mode
 
     
-    def is_soft(self, hand):
-        """Checks whether an Ace is contained within the given hand, meaning the current hand is a soft hand
+    def has_ace(self, hand):
+        """Checks whether an Ace is contained within the given hand
 
         Parameters:
 
@@ -31,7 +31,7 @@ class Player:
 
         Returns:
 
-        bool:Whether given hand is soft or not
+        bool:Whether given hand contains an Ace
         """
 
         for card in hand:
@@ -39,6 +39,23 @@ class Player:
                 return True
 
         return False
+
+    def is_soft(self, hand):
+        """Checks whether the given hand is soft (has an Ace counted as 11)
+
+        Parameters:
+
+        hand (list of Card objects): The hand that the player was given, represented as a list of Card objects
+
+        Returns:
+
+        bool:Whether given hand is soft
+        """
+        if not self.has_ace(hand) or self.hand_total(hand)[0] != self.hand_sum(hand):
+            return False
+
+        return True
+
 
     def is_pair(self, hand, card_type):
         """Checks whether the hand is a pair of a specific type
@@ -102,8 +119,8 @@ class Player:
         list of ints:Totals of current hand
         """
         
-        # If the hand is soft, account for two different totals
-        if self.is_soft(hand):
+        # If the hand has an ace, account for two different totals
+        if self.has_ace(hand):
             total = [0, 0]
 
             for card in hand:
@@ -120,7 +137,7 @@ class Player:
             
             return total
 
-        # Hand is hard, return the sum of all card's values
+        # Hand has no ace, return the sum of all card's values
         else:
             hand_sum = 0
 

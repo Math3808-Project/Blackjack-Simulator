@@ -40,7 +40,6 @@ class Game:
         # create deck if not inputted 
         if deck is None:
             deck = pydealer.Deck()
-            deck.shuffle()
 
         # gameplay conditions
         double_down = False
@@ -48,7 +47,7 @@ class Game:
 
         # draw player hand if hand not inputted
         if player_hand is None:
-            player_hand = deck.deal(2)
+            player_hand = pydealer.Stack(cards = [deck.random_card(True), deck.random_card(True)])
        
         # add second card to player hand for a split
         if player_hand.size < 2:
@@ -56,11 +55,11 @@ class Game:
             if player_hand[0].value == "Ace":
                 split_aces = True
 
-            player_hand.add(deck.deal())
+            player_hand.add(deck.random_card(True))
 
         # draw dealer hand 
         if dealer_hand is None:
-            dealer_hand = deck.deal(2)
+            dealer_hand = pydealer.Stack(cards = [deck.random_card(True), deck.random_card(True)])
 
         # for testing
         if self.dev_mode:
@@ -100,7 +99,7 @@ class Game:
             # hit
             while player_action == definitions.Actions.HIT and not split_aces:
                 # add card to player hand
-                player_hand.add(deck.deal())
+                player_hand.add(deck.random_card(True))
 
                 player_sum = self.player.hand_sum(player_hand)
 
@@ -122,7 +121,7 @@ class Game:
                 double_down = True
 
                 # add single card to player hand
-                player_hand.add(deck.deal())
+                player_hand.add(deck.random_card(True))
                 bet *= 2
 
                 # for testing
@@ -157,7 +156,7 @@ class Game:
 
             # hit, add card to dealer hand
             if dealer_action == definitions.Actions.HIT:
-                dealer_hand.add(deck.deal())
+                dealer_hand.add(deck.random_card(True))
 
                 # compute next dealer action
                 dealer_action = self.dealer.compute_play(dealer_hand)

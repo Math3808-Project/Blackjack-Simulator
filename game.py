@@ -60,31 +60,38 @@ class Game:
 
             player_hand.add(deck.deal())
 
-        # add dealer upcard 
+        # draw dealer hand 
         if dealer_hand is None:
-            dealer_hand = deck.deal()
+            dealer_hand = deck.deal(2)
 
         # for testing
         if self.dev_mode:
             self.print_info(player_hand, dealer_hand, deck.size)
 
+        # the initial action for the player and dealer
         player_action = self.player.compute_play(player_hand, dealer_hand[0], split_aces)
+        dealer_action = self.dealer.compute_play(dealer_hand)
             
         # check for player Blackjack with initial hand
         if player_action == definitions.Actions.BLACKJACK:
             # check if dealer also has Blackjack -> tie
-            if dealer_hand.size == 1:
-                dealer_hand.add(deck.deal())
-
             game_info["player_sum"] = [21]
             game_info["dealer_sum"] = self.dealer.hand_sum(dealer_hand)
 
-            if self.dealer.compute_play(dealer_hand) == definitions.Actions.BLACKJACK:
+            if dealer_action == definitions.Actions.BLACKJACK:
                 game_info["result"] = 0
                 return game_info
 
             # player gets 1.5 to 1 payout for Blackjack
             game_info["result"] = 1.5 * bet
+            return game_info
+
+        # checks for dealer blackjack with initial hand
+        elif dealer_action == definitions.Actions.BLACKJACK:
+            game_info["player_sum"] = self.player.hand_sum(player_hand)
+            game_info["dealer_sum"] = 21
+            game_info["result"] = -1 * bet
+
             return game_info
 
         else:
@@ -104,7 +111,7 @@ class Game:
 
                     # for testing
                     if self.dev_mode:
-                        print("\n___Player's Cards___\n{}".format(player_hand))
+                        print("\n___Player's Cards After Bust___\n{}".format(player_hand))
 
                     return game_info
 
@@ -120,7 +127,7 @@ class Game:
 
                 # for testing
                 if self.dev_mode:
-                    print("\n___Player's Cards___\n{}".format(player_hand))
+                    print("\n___Player's Cards After Bust___\n{}".format(player_hand))
 
                 player_sum = self.player.hand_sum(player_hand)
 
@@ -148,11 +155,12 @@ class Game:
             # handle dealer decisions and final game outcome per draw 
             # precondition: player's hand is not busted
 
-            dealer_action = self.dealer.compute_play(dealer_hand)
-
             # hit, add card to dealer hand
             if dealer_action == definitions.Actions.HIT:
                 dealer_hand.add(deck.deal())
+
+                # compute next dealer action
+                dealer_action = self.dealer.compute_play(dealer_hand)
 
             # blackjack for dealer and not player, player loses betting amount
             elif dealer_action == definitions.Actions.BLACKJACK:

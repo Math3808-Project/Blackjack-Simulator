@@ -219,7 +219,7 @@ class Player:
         void
         """
 
-        print("\n___Player's Cards___\n{}\nDealer's Card: {} \nPlayer's Decision: {}".format(hand, dealers, decision))
+        print("\n___Player's Cards___\n{}\nDealer's Up Card: {} \nPlayer's Decision: {}".format(hand, dealers, decision))
 
 
     def compute_play(self, hand, dealer_upcard, split_aces=False):

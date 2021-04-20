@@ -192,7 +192,7 @@ class Game:
 
         # draw second card if only upcard in hand
         if dealer_hand.size == 1:
-                dealer_hand.add(deck.random_card(True))
+            dealer_hand.add(deck.random_card(True))
 
         # compute initial action
         dealer_action = self.dealer.compute_play(dealer_hand)

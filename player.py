@@ -253,7 +253,7 @@ class Player:
             
             if total == 8:
                 if dealer_up_val in range(5, 7):
-                    if split_aces:
+                    if split_aces or not len(hand) == 2:
                         decision = definitions.Actions.HIT
                     else:
                         decision = definitions.Actions.DOUBLE
@@ -262,7 +262,7 @@ class Player:
             
             if total == 9:
                 if dealer_up_val in range(2, 7):
-                    if split_aces:
+                    if split_aces or not len(hand) == 2:
                         decision = definitions.Actions.HIT
                     else:
                         decision = definitions.Actions.DOUBLE
@@ -271,7 +271,7 @@ class Player:
             
             if total == 10:
                 if dealer_up_val in range(2, 10):
-                    if split_aces:
+                    if split_aces or not len(hand) == 2:
                         decision = definitions.Actions.HIT
                     else:
                         decision = definitions.Actions.DOUBLE
@@ -279,7 +279,7 @@ class Player:
                     decision = definitions.Actions.HIT
             
             if total == 11:
-                if split_aces:
+                if split_aces or not len(hand) == 2:
                     decision = definitions.Actions.HIT
                 else:
                     decision = definitions.Actions.DOUBLE
@@ -303,7 +303,7 @@ class Player:
         else:
             if total in range(13, 17):
                 if dealer_up_val in range(4, 7):
-                    if split_aces:
+                    if split_aces or not len(hand) == 2:
                         decision = definitions.Actions.HIT
                     else:
                         decision = definitions.Actions.DOUBLE
@@ -312,7 +312,7 @@ class Player:
             
             if total == 17:
                 if dealer_up_val in range(2, 7):
-                    if split_aces:
+                    if split_aces or not len(hand) == 2:
                         decision = definitions.Actions.HIT
                     else:
                         decision = definitions.Actions.DOUBLE
@@ -321,7 +321,7 @@ class Player:
 
             if total == 18:
                 if dealer_up_val in range(3, 7):
-                    if split_aces:
+                    if split_aces or not len(hand) == 2:
                         decision = definitions.Actions.STAND
                     else:
                         decision = definitions.Actions.DOUBLE
@@ -332,7 +332,7 @@ class Player:
             
             if total == 19:
                 if dealer_up_val == 6:
-                    if split_aces:
+                    if split_aces or not len(hand) == 2:
                         decision = definitions.Actions.STAND
                     else:
                         decision = definitions.Actions.DOUBLE

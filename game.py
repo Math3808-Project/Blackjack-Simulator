@@ -70,7 +70,7 @@ class Game:
         dealer_action = self.dealer.compute_play(dealer_hand)
             
         # check for player Blackjack with initial hand
-        if player_action == definitions.Actions.BLACKJACK:
+        if player_action == definitions.Actions.BLACKJACK and not split_aces:
             # check if dealer also has Blackjack -> tie
 
             if dealer_action == definitions.Actions.BLACKJACK:
@@ -126,7 +126,7 @@ class Game:
 
                 # for testing
                 if self.dev_mode:
-                    print("\n___Player's Cards After Bust___\n{}".format(player_hand))
+                    print("\n___Player's Cards After Double___\n{}".format(player_hand))
 
                 player_sum = self.player.hand_sum(player_hand)
 

@@ -42,7 +42,7 @@ class Game:
             deck = pydealer.Deck()
 
         # gameplay conditions
-        double_down = False
+        double_down = 1
         split_aces  = False
 
         # draw player hand if hand not inputted
@@ -77,13 +77,13 @@ class Game:
                     result      = 0, 
                     player_sum  = [21],
                     dealer_sum  = 21,
-                    blackjack   = True)
+                    blackjack   = 2)
 
             # player gets 1.5 to 1 payout for Blackjack
             return self.make_result_dict(
                 result      = 1.5 * bet, 
                 player_sum  = [21],
-                blackjack   = True)
+                blackjack   = 1)
 
         else:
             # handle player decisions
@@ -110,7 +110,7 @@ class Game:
 
             # double
             if player_action == definitions.Actions.DOUBLE:
-                double_down = True
+                double_down = 1
 
                 # add single card to player hand
                 player_hand.add(deck.random_card(True))
@@ -140,14 +140,15 @@ class Game:
                     result      = result1["result"] + result2["result"], 
                     player_sum  = result1["player_sum"] + result2["player_sum"],
                     dealer_sum  = result1["dealer_sum"] if result1["dealer_sum"] > result2["dealer_sum"] else result2["dealer_sum"],
-                    split       = True)
+                    double_down = result1["double_down"] + result2["double_down"],
+                    split       = 1 + result1["split"] + result2["split"])
 
         # checks for dealer blackjack with initial hand
         if dealer_action == definitions.Actions.BLACKJACK:
             return self.make_result_dict(
                 result      = -1 * bet,
                 dealer_sum  = 21,
-                blackjack   = True)
+                blackjack   = 1)
 
         while True:
             # handle dealer decisions and final game outcome per draw 
@@ -192,7 +193,7 @@ class Game:
                     dealer_sum  = dealer_sum,
                     double_down = double_down)
                 
-    def make_result_dict(self, result=0, player_sum=[0], dealer_sum=0, blackjack=False, double_down=False, split=False):
+    def make_result_dict(self, result=0, player_sum=[0], dealer_sum=0, blackjack=0, double_down=0, split=0):
         """
         Returns an dictionary that stores game information 
 
@@ -202,14 +203,16 @@ class Game:
             "result": 0,
             "player_sum": [0],
             "dealer_sum": 0,
-            "blackjack": False,
-            "double_down": False,
-            "split": False
+            "blackjack": 0,
+            "double_down": 0,
+            "split": 0
         }
 
         Where the player_sum is a list of sums for each hand the player has in the round 
 
         Both player_sum and dealer_sum represent the final card values. If they are zero, it means their sum was unused during the game.
+
+        blackjack, double_down, and split each represent the number of times each events occurred in the round.
 
         Returns
         -------

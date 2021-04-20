@@ -72,7 +72,6 @@ class Game:
         # check for player Blackjack with initial hand
         if player_action == definitions.Actions.BLACKJACK and not split_aces:
             # check if dealer also has Blackjack -> tie
-
             if dealer_action == definitions.Actions.BLACKJACK:
                 return self.make_result_dict(
                     result      = 0, 
@@ -84,13 +83,6 @@ class Game:
             return self.make_result_dict(
                 result      = 1.5 * bet, 
                 player_sum  = [21],
-                blackjack   = True)
-
-        # checks for dealer blackjack with initial hand
-        elif dealer_action == definitions.Actions.BLACKJACK:
-            return self.make_result_dict(
-                result      = -1 * bet,
-                dealer_sum  = 21,
                 blackjack   = True)
 
         else:
@@ -149,6 +141,13 @@ class Game:
                     player_sum  = result1["player_sum"] + result2["player_sum"],
                     dealer_sum  = result1["dealer_sum"] if result1["dealer_sum"] > result2["dealer_sum"] else result2["dealer_sum"],
                     split       = True)
+
+        # checks for dealer blackjack with initial hand
+        if dealer_action == definitions.Actions.BLACKJACK:
+            return self.make_result_dict(
+                result      = -1 * bet,
+                dealer_sum  = 21,
+                blackjack   = True)
 
         while True:
             # handle dealer decisions and final game outcome per draw 

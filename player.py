@@ -340,7 +340,7 @@ class Player:
                     decision = definitions.Actions.STAND
             
             if total >= 20:
-                if total == 21 and len(hand) == 2:
+                if total == 21 and len(hand) == 2 and not split_aces:
                     decision = definitions.Actions.BLACKJACK
                 else:
                     decision = definitions.Actions.STAND

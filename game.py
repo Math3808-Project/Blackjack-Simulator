@@ -13,7 +13,8 @@ class Game:
         self.player = player.Player(dev_mode)
         self.dealer = dealer.Dealer(dev_mode)
 
-    def game_result(self, bet=1, player_hand=None, dealer_hand=None, deck=None):
+
+    def game_result(self, bet=1, player_hand=None, dealer_hand=None, deck=None, split=False):
         """
         Simulates a game of Blackjack and returns the betting result 
 
@@ -30,11 +31,14 @@ class Game:
             The preset dealer hand      
 
         deck : Deck of cards, optional
-            The current deck of cards in play   
+            The current deck of cards in play  
+
+        split : bool, optional
+            Flag for when the current round is played from a split hand
 
         Returns
         -------
-        A float value representing the player net amount, initial bet included
+        A dictionary representing the various outcomes of the game
         """
 
         # create deck if not inputted 
@@ -65,14 +69,13 @@ class Game:
         if self.dev_mode:
             self.print_info(player_hand, dealer_hand, deck.size)
 
-        # the initial action for the player and dealer
+        # the initial action for the player 
         player_action = self.player.compute_play(player_hand, dealer_hand[0], split_aces)
-        dealer_action = self.dealer.compute_play(dealer_hand)
-            
+
         # check for player Blackjack with initial hand
-        if player_action == definitions.Actions.BLACKJACK and not split_aces:
+        if player_action == definitions.Actions.BLACKJACK:
             # check if dealer also has Blackjack -> tie
-            if dealer_action == definitions.Actions.BLACKJACK:
+            if self.dealer.compute_play(dealer_hand) == definitions.Actions.BLACKJACK:
                 return self.make_result_dict(
                     result      = 0, 
                     player_sum  = [21],
@@ -132,16 +135,58 @@ class Game:
             # split
             if player_action == definitions.Actions.SPLIT:
                 # make recursive calls and add the results of each hand
-                result1 = self.game_result(bet, pydealer.Stack(cards = [player_hand[0]]), dealer_hand, deck)
-                result2 = self.game_result(bet, pydealer.Stack(cards = [player_hand[1]]), dealer_hand, deck)
+                results = [
+                    self.game_result(bet, pydealer.Stack(cards = [player_hand[0]]), dealer_hand, deck, split=True),
+                    self.game_result(bet, pydealer.Stack(cards = [player_hand[1]]), dealer_hand, deck, split=True)
+                ]
+                
+                # play out the non-completed player hands
+                for i in range(2):
+                    if type(results[i]) is list:
+                        results[i] = self.compute_final_result(results[i][0], dealer_hand, deck, results[i][1], results[i][2])
 
                 # combine the two into a single dict
                 return self.make_result_dict(
-                    result      = result1["result"] + result2["result"], 
-                    player_sum  = result1["player_sum"] + result2["player_sum"],
-                    dealer_sum  = result1["dealer_sum"] if result1["dealer_sum"] > result2["dealer_sum"] else result2["dealer_sum"],
-                    double_down = result1["double_down"] + result2["double_down"],
-                    split       = 1 + result1["split"] + result2["split"])
+                    result      = results[0]["result"] + results[1]["result"], 
+                    player_sum  = results[0]["player_sum"] + results[1]["player_sum"],
+                    dealer_sum  = results[0]["dealer_sum"] if results[0]["dealer_sum"] > results[1]["dealer_sum"] else results[1]["dealer_sum"],
+                    double_down = results[0]["double_down"] + results[1]["double_down"],
+                    split       = 1 + results[0]["split"] + results[1]["split"])
+
+        # don't return final result in the case of a split
+        if split:
+            return [player_hand, bet, double_down]
+
+        # return the final result
+        return self.compute_final_result(player_hand, dealer_hand, deck, bet, double_down)
+
+                
+    def compute_final_result(self, player_hand, dealer_hand, deck, bet, double_down):
+        """
+        Computes the final result after consulting the dealer decision
+
+        Parmeters
+        ---------
+        player_hand : Card list
+            The player hand
+            
+        dealer_hand : Card list
+            The dealer hand      
+
+        deck : Deck of cards
+            The current deck of cards in play  
+
+        bet : int
+            The betting amount for this player hand
+
+        double_down : int
+            The number of occurrences of the double down bet
+
+        Returns
+        -------
+        A dictionary containing various game result information
+        """
+        dealer_action = self.dealer.compute_play(dealer_hand)
 
         # checks for dealer blackjack with initial hand
         if dealer_action == definitions.Actions.BLACKJACK:
@@ -192,7 +237,8 @@ class Game:
                     player_sum  = [player_sum],
                     dealer_sum  = dealer_sum,
                     double_down = double_down)
-                
+
+
     def make_result_dict(self, result=0, player_sum=[0], dealer_sum=0, blackjack=0, double_down=0, split=0):
         """
         Returns an dictionary that stores game information 
@@ -229,6 +275,7 @@ class Game:
         }
 
         return result_dict
+    
     
     def print_info(self, player_hand, dealer_hand, num_cards):
         """

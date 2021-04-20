@@ -15,42 +15,20 @@ card_values = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "K
 
 card_suits = ["Clubs", "Hearts", "Spades", "Diamonds"]
 
-def main():
-    # construct deck of 52 cards
-    deck = pydealer.Deck()
+def test_all_2card_hands(pl, dlr):
+    """Function to test all 2 card hands for the compute_play function
+       Goes through all possible combinations and outputs the results to a file.
 
-    pl = player.Player()
-    dlr = dealer.Dealer()
+    Parameters:
 
-    # testing value_to_int function
-    #for card in deck:
-    #    print("{} | {}".format(card, pl.value_to_int(card))) 
+    pl (Player Object) : Instance of player class to use compute_play function
 
-    # shuffle the cards
-    deck.shuffle()
+    dlr (Dealer Object) : Instance of dealer class to use compute_play function
 
-    # testing hand_total & valid_total function
-    hand = deck.deal(2)
+    Returns:
 
-    return_total = pl.valid_total(pl.hand_total(hand))
-
-    #print("{} | Total: {}".format(hand, return_total))
-
-    # testing valid_total function
-
-    hand2 = deck.deal(3)
-
-    return_total2 = pl.valid_total(pl.hand_total(hand2))
-
-    #print("{} | Total: {}".format(hand2, return_total2))
-
-    #print()
-    #print()
-
-    # testing compute_hand function
-
-    #pl.compute_play(hand, hand2[0])
-
+    None
+    """
     # open file for dumping test information
     f = open("test_player_basic_strat.txt", "w")
     f2 = open("test_dealer_strat.txt", "w")
@@ -105,9 +83,100 @@ def main():
         
     f.close()
     f2.close()
+    print("done 2 card hand testing...")
+
+def test_ace_counting(plr):
+    """Function to test ace counting in a blackjack hand
+    
+    Parameters:
+
+    plr (Player Object) : Instance of player class to use compute_play function
+
+    Returns:
+
+    None
+    """
+
+    # Create a 3 card hand of cards
+    hand = pydealer.Stack(cards = [
+                pydealer.Card("Ace", card_suits[randint(0, 3)]),
+                pydealer.Card("5", card_suits[randint(0, 3)]),
+                pydealer.Card("3", card_suits[randint(0, 3)])
+           ])
+    
+    print("Player's Cards:")
+    print(hand)
+    print("Hand total: {}".format(plr.hand_sum(hand)))
+    print("Soft? {}\n".format(plr.is_soft(hand)))
+    
+
+    hand2 = pydealer.Stack(cards = [
+                pydealer.Card("Ace", card_suits[randint(0, 3)]),
+                pydealer.Card("5", card_suits[randint(0, 3)]),
+                pydealer.Card("Ace", card_suits[randint(0, 3)])
+            ])
+
+    print("Player's Cards:")
+    print(hand2)
+    print("Hand total: {}".format(plr.hand_sum(hand2)))
+    print("Soft? {}\n".format(plr.is_soft(hand2)))
+
+    hand3 = pydealer.Stack(cards = [
+                pydealer.Card("Ace", card_suits[randint(0, 3)]),
+                pydealer.Card("5", card_suits[randint(0, 3)]),
+                pydealer.Card("Ace", card_suits[randint(0, 3)]),
+                pydealer.Card("8", card_suits[randint(0, 3)])
+            ])
+
+    print("Player's Cards:")
+    print(hand3)
+    print("Hand total: {}".format(plr.hand_sum(hand3)))
+    print("Soft? {}\n".format(plr.is_soft(hand3)))
+
+    hand4 = pydealer.Stack(cards = [
+                pydealer.Card("4", card_suits[randint(0, 3)]),
+                pydealer.Card("6", card_suits[randint(0, 3)]),
+                pydealer.Card("Ace", card_suits[randint(0, 3)])
+            ])
+
+    print("Player's Cards:")
+    print(hand4)
+    print("Hand total: {}".format(plr.hand_sum(hand4)))
+    print("Soft? {}\n".format(plr.is_soft(hand4)))
+
+    hand4 = pydealer.Stack(cards = [
+                pydealer.Card("4", card_suits[randint(0, 3)]),
+                pydealer.Card("6", card_suits[randint(0, 3)]),
+                pydealer.Card("Ace", card_suits[randint(0, 3)]),
+                pydealer.Card("Ace", card_suits[randint(0, 3)])
+            ])
+
+    print("Player's Cards:")
+    print(hand4)
+    print("Hand total: {}".format(plr.hand_sum(hand4)))
+    print("Soft? {}\n".format(plr.is_soft(hand4)))
+
+    print("done testing ace counting...")
+
+def main():
+    # construct deck of 52 cards
+    deck = pydealer.Deck()
+
+    # init dealer and player classes
+    pl = player.Player()
+    dlr = dealer.Dealer()
+
+    # randomize deck aka shuffle
+    deck.shuffle()
+
+    # call function to test all 2 card hands
+    test_all_2card_hands(pl, dlr)
+    
+    # call function to test ace counting
+    #test_ace_counting(pl)
+
     print("done testing...")
 
-    
 
 if __name__ == "__main__":
     main()

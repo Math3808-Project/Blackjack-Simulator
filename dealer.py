@@ -21,7 +21,7 @@ class Dealer:
     def __init__(self, dev_mode=False):
         self.dev_mode = dev_mode
     
-    def is_soft(self, hand):
+    def has_ace(self, hand):
         """Checks whether an Ace is contained within the given hand, meaning the current hand is a soft hand
 
         Parameters:
@@ -75,9 +75,12 @@ class Dealer:
         list of ints:Totals of current hand
         """
         
-        # If the hand is soft, account for two different totals
-        if self.is_soft(hand):
+        # If the hand has an ace, account for two different totals
+        if self.has_ace(hand):
             total = [0, 0]
+
+            # var to store number of aces that are to be considered as 11 in the final total
+            num_of_full_aces = 1
 
             for card in hand:
                 # Convert card's string value into a numeric value
@@ -85,7 +88,15 @@ class Dealer:
 
                 # Case where we encountered an Ace
                 if (val == 1):
-                    total[0] += 11
+                    # If current Ace is the first ace we have seen, consider it with value 11 in calculations
+                    if num_of_full_aces > 0:
+                        total[0] += 11
+                        num_of_full_aces -= 1
+                    # Otherwise, this is not the first Ace we've seen meaning we should consider its value 1 so as not to bust the total
+                    else:
+                        total[0] += 1
+
+                    # Increase the smaller total with value 1
                     total[1] += 1
                 else:
                     total[0] += val
@@ -93,7 +104,7 @@ class Dealer:
             
             return total
 
-        # Hand is hard, return the sum of all card's values
+        # Hand has no ace, return the sum of all card's values
         else:
             total = 0
 
@@ -123,14 +134,29 @@ class Dealer:
             curr_max = max(totals)
             curr_min = min(totals)
 
-            # error case
             if curr_max > 21 and curr_min > 21:
-                return None
+                return curr_min
             
             if curr_max > 21:
                 return curr_min
             else:
                 return curr_max
+
+    def hand_sum(self, hand):
+        """
+        Generates the numerical sum of a playing hand
+
+        Parmeters
+        ---------
+        hand : Card list
+            The hand to calculate
+
+        Returns
+        -------
+        int : An integer representing the numerical sum of a blackjack hand
+        """
+
+        return self.valid_total(self.hand_total(hand))
             
     def print_decision(self, hand, decision):
         """Print out current hand and decision that is given
@@ -146,10 +172,7 @@ class Dealer:
         void
         """
 
-        # Join all cards together in a string
-        hand_str = "|".join(hand)
-
-        print("Dealer's Cards: {}\nDealer's Decision: {}".format(hand_str, decision))
+        print("\n___Dealer's Cards___\n{}\nDealer's Decision: {}".format(hand, decision))
     
     def compute_play(self, hand):
         """Computes the dealer's decision based on their given BlackJack hand
@@ -168,7 +191,7 @@ class Dealer:
         decision = definitions.Actions.STAND
 
         # Var to store hand total
-        total = self.valid_total(self.hand_total(hand))
+        total = self.hand_sum(hand)
 
         # any total less than 17 dealer hits
         if total < 17:

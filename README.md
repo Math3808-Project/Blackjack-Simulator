@@ -32,8 +32,12 @@ From these multiple trials, we extract the win/lose probabilities for both Deale
 # Blackjack Rules Assumed
 - Single deck
 - Dealer stands on any 17 (including soft 17)
+- No hole card: dealer does not draw nor consult their second card until after the player's final decision
 - Split up to four hands
 - Double down on any two initial cards, except for split Aces
+- Split Aces may not hit (stand after drawing second card)
+- No Blackjack after receiving a 10-value card after splitting Aces
+- You can only double/split on the first move, or the first move of a hand created by a split
 - Surrender not permitted 
 
 # Basic Strategy Used

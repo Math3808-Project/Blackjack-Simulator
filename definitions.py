@@ -1,6 +1,7 @@
 from enum import Enum
 
 class Actions(Enum):
+    NONE      = 0
     HIT       = 1
     STAND     = 2
     DOUBLE    = 3

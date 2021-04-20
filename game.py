@@ -61,9 +61,9 @@ class Game:
 
             player_hand.add(deck.random_card(True))
 
-        # draw dealer hand 
+        # draw dealer upcard 
         if dealer_hand is None:
-            dealer_hand = pydealer.Stack(cards = [deck.random_card(True), deck.random_card(True)])
+            dealer_hand = pydealer.Stack(cards = [deck.random_card(True)])
 
         # for testing
         if self.dev_mode:
@@ -75,6 +75,9 @@ class Game:
         # check for player Blackjack with initial hand
         if player_action == definitions.Actions.BLACKJACK:
             # check if dealer also has Blackjack -> tie
+            if dealer_hand.size == 1:
+                dealer_hand.add(deck.random_card(True))
+
             if self.dealer.compute_play(dealer_hand) == definitions.Actions.BLACKJACK:
                 return self.make_result_dict(
                     result      = 0, 
@@ -186,6 +189,12 @@ class Game:
         -------
         A dictionary containing various game result information
         """
+
+        # draw second card if only upcard in hand
+        if dealer_hand.size == 1:
+                dealer_hand.add(deck.random_card(True))
+
+        # compute initial action
         dealer_action = self.dealer.compute_play(dealer_hand)
 
         # checks for dealer blackjack with initial hand

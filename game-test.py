@@ -34,9 +34,7 @@ def main():
                     deck.get(j+" of Spades")[0]])
 
                 dealer_hand = pydealer.Stack(cards = [
-                    deck.get(k + " of Diamonds")[0],
-                    deck.random_card(True)
-                ])
+                    deck.get(k + " of Diamonds")[0]])
 
                 print("\n\n-----------[ New Game ]-----------\n\n")
 

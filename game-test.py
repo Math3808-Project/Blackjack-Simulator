@@ -21,21 +21,30 @@ def main():
         # traverse card values for making the player's second card
         for j in card_values:
 
-            # deck used during gameplay
-            deck = pydealer.Deck()
-            deck.shuffle()
+            # traverse card values for dealer upcard 
+            for k in card_values:
 
-            # assemble player hand
-            hand = pydealer.Stack(cards = [
-                deck.get(i+" of Hearts")[0],
-                deck.get(j+" of Spades")[0]])
+                # deck used during gameplay
+                deck = pydealer.Deck()
+                deck.shuffle()
 
-            print("\n\n-----------[ New Game ]-----------\n\n")
+                # assemble player hand
+                hand = pydealer.Stack(cards = [
+                    deck.get(i+" of Hearts")[0],
+                    deck.get(j+" of Spades")[0]])
 
-            # play game with the hand
-            game_dict = bj.game_result(bet=bet_amount, player_hand=hand, deck=deck)
+                dealer_hand = pydealer.Stack(cards = [
+                    deck.get(k + " of Diamonds")[0],
+                    deck.random_card(True)
+                ])
 
-            print("\nPlayer Result After ${} Initial Bet: ${}\n".format(bet_amount, game_dict["result"]))
+                print("\n\n-----------[ New Game ]-----------\n\n")
+
+                # play game with the hand
+                game_dict = bj.game_result(bet=bet_amount, player_hand=hand, dealer_hand=dealer_hand, deck=deck)
+
+                print("\nPlayer Result After ${} Initial Bet: ${}\n".format(bet_amount, game_dict["result"]))
+                print(game_dict)
         
     sys.stdout.close()
 

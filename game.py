@@ -42,7 +42,7 @@ class Game:
             deck = pydealer.Deck()
 
         # gameplay conditions
-        double_down = 1
+        double_down = 0
         split_aces  = False
 
         # draw player hand if hand not inputted

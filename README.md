@@ -11,7 +11,7 @@ Final Project - MATH 3808 W21
 - Eren Sulutas - 101101873
 - Nabeel Warsalee - 101103167
 - Cailyn Edwards - 100956026
-- Henry Wang
+- Jingyi Wang - 101082676
 
 ### Professor
 - Zhicheng Gao

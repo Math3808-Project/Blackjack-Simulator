@@ -2,6 +2,8 @@
 
 Final Project - MATH 3808 W21
 
+[Detailed Report](https://cmailcarletonca-my.sharepoint.com/:w:/g/personal/nabeelwarsalee_cmail_carleton_ca/Ee786zT-MfhEstP37LZOzxEBrpjhFdE_WQYhfXByFHA8Gw?e=XPxzeZ)
+
 # Instructions for Use 
 - [Download](https://www.python.org/downloads/release) the latest version of python (if not installed)
 - Install the dependencies by entering the following into the terminal: 

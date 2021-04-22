@@ -11,6 +11,10 @@ Final Project - MATH 3808 W21
   - `pip install yaspin`
 - Start the simulation by entering the following into the terminal: `py simulator.py`
 
+https://user-images.githubusercontent.com/6361099/115772224-d92fe900-a37c-11eb-8a91-ddd1ee84a77b.mov
+
+<img width="1320" alt="Screen Shot 2021-04-22 at 3 11 44 PM" src="https://user-images.githubusercontent.com/6361099/115772505-32981800-a37d-11eb-8d34-9a5f8122c22f.png">
+
 ## Project Info
 
 ### Members

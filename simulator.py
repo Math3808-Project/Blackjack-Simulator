@@ -57,7 +57,7 @@ class Simulator:
 
         self.adjust_dealer_dist(dealer_dist, non_final_hands)
         
-        print(f'\nResult for this simulation batch: {sum(results)/self.sim_count}')
+        print(f'\nResult for this simulation batch: \n  Player EV: {sum(results)/self.sim_count}\n  House Edge: {-1 * sum(results)/self.sim_count}')
         print("Dealer Final Hand Distribution: {}\n".format(dealer_dist))
         self.get_overall_average(results)
 
@@ -106,7 +106,7 @@ class Simulator:
         prev_totals = open("overall_avg.csv", "w")
         prev_totals.write(f'total_sims,result_sum\n{total_sims},{result_sum}')
         
-        print(f'Adjusted overall result for {total_sims} simulations: {result_sum/total_sims}')
+        print(f'Adjusted overall result for {total_sims} simulations: \n  Player EV: {result_sum/total_sims}\n  House Edge: {-1*result_sum/total_sims}')
 
     def store_dealer_dist(self, dealer_dist, non_final_hands, result_dict):
         """ Adjusts the dealer_dist dictionary with the sum from the round

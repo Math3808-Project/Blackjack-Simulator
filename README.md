@@ -3,7 +3,9 @@
 Final Project - MATH 3808 W21
 
 # Instructions for Use 
-- Coming soon
+- [Download](https://www.python.org/downloads/release) the latest version of python (if not installed)
+- Install the dependency by entering the following into the terminal: `pip install pydealer`
+- Start the simulation by entering the following into the terminal: `py simulator.py`
 
 ## Project Info
 
